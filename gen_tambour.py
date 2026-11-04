@@ -38,11 +38,12 @@ TORE_CERC_R    = R_HAUT + 0.55 * SCALE
 TORE_CERC_TUBE = 1.25 * SCALE
 TORE_CERC_Z    = H + 0.25 * SCALE
 
-BOUCLE_R    = 3.6
-BOUCLE_TUBE = 1.2
-BOUCLE_DX   = 1.2
-BOUCLE_Z = H + 0.9 + 1.5 + BOUCLE_R
-BOUCLE_CX = R_HAUT + BOUCLE_DX + BOUCLE_R
+# Crochet directement integre a la face du tambour : la boucle (tore horizontal)
+# penetre la paroi superieure du fut, aucun bras intermediaire.
+BOUCLE_R    = 4.2    # rayon de la boucle
+BOUCLE_TUBE = 1.3    # section du tore
+BOUCLE_Z    = H - 1.2            # hauteur du centre de la boucle (dans la paroi haute)
+BOUCLE_CX   = R_HAUT + 3.55      # deport : le tore mord dans le fut, le trou reste degage
 
 # ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
 def _arc(cx, cy, r, a0, a1, n=16):
@@ -220,21 +221,8 @@ def build():
             a, b, c, d = rings[k][i], rings[k+1][i], rings[k+1][i2], rings[k][i2]
             m.quad(a, b, c, d)
     add_tore(m, TORE_CERC_Z, TORE_CERC_R, TORE_CERC_TUBE, 24, 96)
-    # --- bras du crochet : epais, aminci vers la boucle, ancre dans le fut (integre) ---
-    x_in, x_out = R_HAUT - 3.0, BOUCLE_CX - BOUCLE_R + BOUCLE_TUBE - 0.2
-    yb0, yb1 = -2.8, 2.8      # largeur a la base (cote fut)
-    yt0, yt1 = -1.9, 1.9      # largeur a l'extremite (cote boucle)
-    zb, zt = H - 1.0, BOUCLE_Z + 0.9
-    p1 = m.v(x_in, yb0, zb); p2 = m.v(x_out, yt0, zb)
-    p3 = m.v(x_out, yt1, zb); p4 = m.v(x_in, yb1, zb)
-    p5 = m.v(x_in, yb0, zt); p6 = m.v(x_out, yt0, zt)
-    p7 = m.v(x_out, yt1, zt); p8 = m.v(x_in, yb1, zt)
-    m.quad(p1, p2, p3, p4)
-    m.quad(p5, p8, p7, p6)
-    m.quad(p1, p4, p8, p5)
-    m.quad(p2, p6, p7, p3)
-    m.quad(p1, p5, p6, p2)
-    m.quad(p4, p3, p7, p8)
+    # --- crochet integre directement a la face du tambour : boucle seule, ---
+    # --- le tore penetre la paroi haute du fut (pas de bras) ---
     add_tore(m, BOUCLE_Z, BOUCLE_R, BOUCLE_TUBE, 26, 64, cx=BOUCLE_CX)
     add_cylindre(m, 2.6, H - 0.8, H + 0.15, n=20)
     add_texte(m, TEXT, TXT_ZBOT, TXT_W, TXT_H, TXT_RELIEF)
