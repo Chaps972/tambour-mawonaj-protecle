@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generateur STL : tambour antillais porte-cle (Anycubic Kobra 3).
-Python pur : maillage manuel, STL binaire, validation, rendu PNG.
+Python pur : maillage manuel, STL binaire, validation.
+Version 2 : crochet integre au fut, inscription script (M majuscule), plus de details.
 """
-import math, struct, zlib
+import math, struct
 
 # ---------------- Parametres (mm) ----------------
 SCALE    = 0.75    # echelle porte-cle (0.75 => ~42 mm de haut)
@@ -12,22 +13,26 @@ R_HAUT   = 15.0 * SCALE    # rayon en haut (sous la peau)
 BULGE    = 4.5 * SCALE     # bombe maximal du fut
 DOME     = 0.9 * SCALE     # bombe de la peau
 N_CORDES = 8
-CORDE_AMP = 0.45 * SCALE
+CORDE_AMP = 0.55 * SCALE   # cordons un peu plus marques
 NT = 160           # resolution angulaire
 NZ = 96            # resolution verticale du fut
 N_RING_PEAU = 26
 
 BANDE_BAS  = (1.6, 4.0, 0.75)
 BANDE_BAS  = (BANDE_BAS[0]*SCALE, BANDE_BAS[1]*SCALE, BANDE_BAS[2]*SCALE)
+BANDE_BAS2 = (0.5, 1.3, 0.45)   # seconde bande basse (plus de details)
+BANDE_BAS2 = (BANDE_BAS2[0]*SCALE, BANDE_BAS2[1]*SCALE, BANDE_BAS2[2]*SCALE)
 BANDE_HAUT = ((H - 6.0*SCALE), (H - 3.6*SCALE), 0.75*SCALE)
 CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV = 0.28*H, 0.42*H, 0.85*SCALE, 8
+CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.55*H, 0.72*H, 0.70*SCALE, 8  # 2e rangee de chevrons
 
-TEXT       = "MAWONAJ"
-TXT_ZBOT   = 0.478 * H
+TEXT       = "Mawonaj"   # script, M majuscule
+TXT_ZBOT   = 0.470 * H
 TXT_W      = 0.60 * SCALE
 TXT_H      = 0.62 * SCALE
 TXT_RELIEF = 1.6 * SCALE
-TXT_ZONE   = (TXT_ZBOT - 1.5 * SCALE, TXT_ZBOT + 7 * TXT_H + 1.5 * SCALE)
+TXT_HW     = 0.55          # demi-largeur des traits (en unites de glyphe)
+TXT_ZONE   = (TXT_ZBOT - 2.4*TXT_H - 0.4, TXT_ZBOT + 7.4*TXT_H + 0.4)
 
 TORE_CERC_R    = R_HAUT + 0.55 * SCALE
 TORE_CERC_TUBE = 1.25 * SCALE
@@ -39,36 +44,24 @@ BOUCLE_DX   = 1.2
 BOUCLE_Z = H + 0.9 + 1.5 + BOUCLE_R
 BOUCLE_CX = R_HAUT + BOUCLE_DX + BOUCLE_R
 
-FONT = {
- 'A': ["01110","10001","10001","11111","10001","10001","10001"],
- 'B': ["11110","10001","10001","11110","10001","10001","11110"],
- 'C': ["01111","10000","10000","10000","10000","10000","01111"],
- 'D': ["11110","10001","10001","10001","10001","10001","11110"],
- 'E': ["11111","10000","10000","11110","10000","10000","11111"],
- 'F': ["11111","10000","10000","11110","10000","10000","10000"],
- 'G': ["01111","10000","10000","10111","10001","10001","01111"],
- 'H': ["10001","10001","10001","11111","10001","10001","10001"],
- 'I': ["11111","00100","00100","00100","00100","00100","11111"],
- 'J': ["00111","00010","00010","00010","00010","10010","01100"],
- 'K': ["10001","10010","10100","11000","10100","10010","10001"],
- 'L': ["10000","10000","10000","10000","10000","10000","11111"],
- 'M': ["10001","11011","10101","10101","10001","10001","10001"],
- 'N': ["10001","11001","10101","10011","10001","10001","10001"],
- 'O': ["01110","10001","10001","10001","10001","10001","01110"],
- 'P': ["11110","10001","10001","11110","10000","10000","10000"],
- 'Q': ["01110","10001","10001","10001","10101","10010","01101"],
- 'R': ["11110","10001","10001","11110","10100","10010","10001"],
- 'S': ["01111","10000","10000","01110","00001","00001","11110"],
- 'T': ["11111","00100","00100","00100","00100","00100","00100"],
- 'U': ["10001","10001","10001","10001","10001","10001","01110"],
- 'V': ["10001","10001","10001","10001","10001","01010","00100"],
- 'W': ["10001","10001","10001","10101","10101","11011","10001"],
- 'X': ["10001","10001","01010","00100","01010","10001","10001"],
- 'Y': ["10001","10001","01010","00100","00100","00100","00100"],
- 'Z': ["11111","00001","00010","00100","01000","10000","11111"],
- ' ': ["00000","00000","00000","00000","00000","00000","00000"],
- '-': ["00000","00000","00000","11111","00000","00000","00000"],
+# ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
+def _arc(cx, cy, r, a0, a1, n=16):
+    return [(cx + r*math.cos(a0 + (a1-a0)*i/n), cy + r*math.sin(a0 + (a1-a0)*i/n)) for i in range(n+1)]
+
+_R = math.radians
+SCRIPT = {
+ 'M': [[(0.0,0.2),(0.15,2.6),(0.5,5.4),(0.95,7.0),(1.5,4.4),(1.9,1.6),(2.3,5.2),(2.75,7.0),(3.25,4.0),(3.65,0.4),(4.4,0.0)]],
+ 'a': [_arc(1.5,2.6,1.8, _R(75), _R(75)-2*math.pi, 20) + [(3.3,4.5),(3.3,0.3),(3.95,-0.2)]],
+ 'w': [[(0.0,4.6),(0.8,0.2),(1.6,4.4),(2.4,0.2),(3.2,4.6)]],
+ 'o': [_arc(1.8,2.6,1.8, _R(90), _R(90)-2*math.pi, 20) + [(1.8,4.4),(2.7,4.7)]],
+ 'n': [[(0.0,4.6),(0.3,2.2),(0.45,0.2),(1.0,3.4),(1.7,4.6),(2.2,2.2),(2.5,0.2),(3.15,3.8)]],
+ 'j': [_arc(1.0,6.1,0.45, 0, -2*math.pi, 10),
+       [(1.0,4.6),(1.0,0.6),(0.7,-0.8),(-0.1,-1.7),(-0.95,-1.25)]],
 }
+
+def _adv(ch):
+    g = SCRIPT.get(ch, SCRIPT['o'])
+    return max(p[0] for stroke in g for p in stroke) + 1.1
 
 def bande(z, z0, z1, h, ramp=0.8):
     if z < z0 - ramp or z > z1 + ramp:
@@ -86,12 +79,15 @@ def radius(theta, z):
     cf = 0.10 if (TXT_ZONE[0] <= z <= TXT_ZONE[1]) else 1.0
     r += CORDE_AMP * att * cf * math.cos(N_CORDES * theta)
     r += bande(z, *BANDE_BAS)
+    r += bande(z, *BANDE_BAS2)
     r += bande(z, *BANDE_HAUT)
-    if CHEV_Z0 <= z <= CHEV_Z1:
-        ph = (N_CHEV * theta / (2 * math.pi)) % 1.0
-        tri = 2 * ph if ph < 0.5 else 2 * (1 - ph)
-        lissage = math.sin(math.pi * (z - CHEV_Z0) / (CHEV_Z1 - CHEV_Z0))
-        r += CHEV_AMP * tri * lissage
+    for (z0, z1, amp, nch, phase) in ((CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV, 0.0),
+                                       (CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2, math.pi / N_CHEV2)):
+        if z0 <= z <= z1:
+            ph = ((nch * theta / (2 * math.pi)) + phase) % 1.0
+            tri = 2 * ph if ph < 0.5 else 2 * (1 - ph)
+            lissage = math.sin(math.pi * (z - z0) / (z1 - z0))
+            r += amp * tri * lissage
     return r
 
 def peau_z(r):
@@ -144,79 +140,54 @@ def add_cylindre(mesh, r, z0, z1, n=28):
         mesh.tri(cb, bas[i2], bas[i])
         mesh.tri(ch, haut[i], haut[i2])
 
+def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
+    """Extrude un trait (polyligne en unites de glyphe) en relief courbe sur le fut."""
+    n = len(poly)
+    # direction en chaque point (moyenne des segments adjacents)
+    dirs = []
+    for i in range(n):
+        if i == 0:
+            dx, dy = poly[1][0]-poly[0][0], poly[1][1]-poly[0][1]
+        elif i == n-1:
+            dx, dy = poly[n-1][0]-poly[n-2][0], poly[n-1][1]-poly[n-2][1]
+        else:
+            dx = poly[i+1][0]-poly[i-1][0]; dy = poly[i+1][1]-poly[i-1][1]
+        ln = math.hypot(dx, dy) or 1.0
+        dirs.append((dx/ln, dy/ln))
+    Lin, Lout, Rin, Rout = [], [], [], []
+    for i, (px, py) in enumerate(poly):
+        dx, dy = dirs[i]
+        ox, oy = -dy * TXT_HW, dx * TXT_HW   # perpendiculaire
+        for (sx, out) in ((1, 'L'), (-1, 'R')):
+            gx = x_off + px + sx*ox
+            gy = py + sx*oy
+            a = th0 + (gx * w) / r_loc
+            z = z_bot + gy * h
+            rs = radius(a, z)
+            ro = rs + relief
+            vi = m.v(rs*math.cos(a), rs*math.sin(a), z)
+            vo = m.v(ro*math.cos(a), ro*math.sin(a), z)
+            if out == 'L':
+                Lin.append(vi); Lout.append(vo)
+            else:
+                Rin.append(vi); Rout.append(vo)
+    for i in range(n-1):
+        m.quad(Lout[i], Rout[i], Rout[i+1], Lout[i+1])      # dessus
+        m.quad(Lin[i], Lin[i+1], Rin[i+1], Rin[i])          # dessous (sur la peau)
+        m.quad(Lin[i], Lout[i], Lout[i+1], Lin[i+1])        # paroi gauche
+        m.quad(Rin[i], Rin[i+1], Rout[i+1], Rout[i])        # paroi droite
+    m.quad(Lin[0], Lout[0], Rout[0], Rin[0])                # cap debut
+    m.quad(Lin[n-1], Lout[n-1], Rout[n-1], Rin[n-1])        # cap fin
+
 def add_texte(m, text, z_bot, w, h, relief):
-    cols_per = 6
-    total_w = len(text) * cols_per * w
-    z_top = z_bot + 7 * h
     r_loc = radius(0.0, z_bot + 3.5 * h)
-    th0 = -(total_w / 2) / r_loc
-    for li, ch in enumerate(text):
-        glyph = FONT.get(ch, FONT[' '])
-        rects = []
-        used = [[False] * 5 for _ in range(7)]
-        for col in range(5):
-            row = 0
-            while row < 7:
-                if glyph[row][col] == '1' and not used[row][col]:
-                    r2 = row
-                    while r2 + 1 < 7 and glyph[r2 + 1][col] == '1' and not used[r2 + 1][col]:
-                        r2 += 1
-                    rects.append((col, row, col, r2))
-                    for rr in range(row, r2 + 1):
-                        used[rr][col] = True
-                    row = r2 + 1
-                else:
-                    row += 1
-        merged = []
-        taken = set()
-        for (c1, r1, c2, r2) in sorted(rects, key=lambda t: (t[1], t[3], t[0])):
-            if (c1, r1, c2, r2) in taken:
-                continue
-            cc = c1
-            while cc + 1 <= 4:
-                ok = True
-                for rr in range(r1, r2 + 1):
-                    if glyph[rr][cc + 1] != '1':
-                        ok = False
-                        break
-                if ok:
-                    same = True
-                    for rr in range(7):
-                        if glyph[rr][cc + 1] == '1' and not (r1 <= rr <= r2):
-                            same = False
-                            break
-                    if not same:
-                        ok = False
-                if not ok:
-                    break
-                cc += 1
-            for c in range(c1, cc + 1):
-                for rr in range(r1, r2 + 1):
-                    taken.add((c, rr))
-            merged.append((c1, r1, cc, r2))
-        for (c1, r1, c2, r2) in merged:
-            x0 = li * cols_per + c1
-            x1 = li * cols_per + c2 + 1
-            a1 = th0 + (x0 * w - 0.08 * w) / r_loc
-            a2 = th0 + (x1 * w + 0.08 * w) / r_loc
-            zz1 = z_top - (r2 + 1) * h - 0.08 * h
-            zz2 = z_top - r1 * h + 0.08 * h
-            rb = radius(0.0, zz1) + relief
-            rt = radius(0.0, zz2) + relief
-            Ain  = m.v(radius(a1, zz1)*math.cos(a1), radius(a1, zz1)*math.sin(a1), zz1)
-            Bin  = m.v(radius(a2, zz1)*math.cos(a2), radius(a2, zz1)*math.sin(a2), zz1)
-            Cin  = m.v(radius(a2, zz2)*math.cos(a2), radius(a2, zz2)*math.sin(a2), zz2)
-            Din  = m.v(radius(a1, zz2)*math.cos(a1), radius(a1, zz2)*math.sin(a1), zz2)
-            Aout = m.v(rb*math.cos(a1), rb*math.sin(a1), zz1)
-            Bout = m.v(rb*math.cos(a2), rb*math.sin(a2), zz1)
-            Cout = m.v(rt*math.cos(a2), rt*math.sin(a2), zz2)
-            Dout = m.v(rt*math.cos(a1), rt*math.sin(a1), zz2)
-            m.quad(Aout, Bout, Cout, Dout)
-            m.quad(Ain, Din, Cin, Bin)
-            m.quad(Ain, Bin, Bout, Aout)
-            m.quad(Din, Dout, Cout, Cin)
-            m.quad(Ain, Aout, Dout, Din)
-            m.quad(Bin, Cin, Cout, Bout)
+    total_units = sum(_adv(ch) for ch in text)
+    th0 = -(total_units * w / 2) / r_loc
+    x_off = 0.0
+    for ch in text:
+        for poly in SCRIPT.get(ch, SCRIPT['o']):
+            _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc)
+        x_off += _adv(ch)
 
 def build():
     m = Mesh()
@@ -249,13 +220,15 @@ def build():
             a, b, c, d = rings[k][i], rings[k+1][i], rings[k+1][i2], rings[k][i2]
             m.quad(a, b, c, d)
     add_tore(m, TORE_CERC_Z, TORE_CERC_R, TORE_CERC_TUBE, 24, 96)
-    x_in, x_out = R_HAUT - 1.0, BOUCLE_CX - BOUCLE_R + BOUCLE_TUBE - 0.2
-    yc0, yc1 = -2.0, 2.0
-    zb, zt = H - 0.6, BOUCLE_Z + 0.7
-    p1 = m.v(x_in, yc0, zb); p2 = m.v(x_out, yc0, zb)
-    p3 = m.v(x_out, yc1, zb); p4 = m.v(x_in, yc1, zb)
-    p5 = m.v(x_in, yc0, zt); p6 = m.v(x_out, yc0, zt)
-    p7 = m.v(x_out, yc1, zt); p8 = m.v(x_in, yc1, zt)
+    # --- bras du crochet : epais, aminci vers la boucle, ancre dans le fut (integre) ---
+    x_in, x_out = R_HAUT - 3.0, BOUCLE_CX - BOUCLE_R + BOUCLE_TUBE - 0.2
+    yb0, yb1 = -2.8, 2.8      # largeur a la base (cote fut)
+    yt0, yt1 = -1.9, 1.9      # largeur a l'extremite (cote boucle)
+    zb, zt = H - 1.0, BOUCLE_Z + 0.9
+    p1 = m.v(x_in, yb0, zb); p2 = m.v(x_out, yt0, zb)
+    p3 = m.v(x_out, yt1, zb); p4 = m.v(x_in, yb1, zb)
+    p5 = m.v(x_in, yb0, zt); p6 = m.v(x_out, yt0, zt)
+    p7 = m.v(x_out, yt1, zt); p8 = m.v(x_in, yb1, zt)
     m.quad(p1, p2, p3, p4)
     m.quad(p5, p8, p7, p6)
     m.quad(p1, p4, p8, p5)

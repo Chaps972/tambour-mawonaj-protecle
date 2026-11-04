@@ -1,23 +1,24 @@
-# Tambour antillais porte-clés « MAWONAJ » — Anycubic Kobra 3
+# Tambour antillais porte-clés « Mawonaj » — Anycubic Kobra 3
 
-Projet de fichier STL imprimable en 3D : tambour antillais (gwoka) en porte-clés avec l'inscription **MAWONAJ** en relief courbe sur le fût et anneau porte-clés intégré.
+Projet de fichier STL imprimable en 3D : tambour antillais (gwoka) en porte-clés avec l'inscription **Mawonaj** en relief, écrite en **script (M majuscule)**, courbée sur le fût, et crochet porte-clés **intégré au fût**.
 
 ## Fichiers du projet
 
 | Fichier | Rôle |
 |---|---|
 | `gen_tambour.py` | Générateur Python pur (aucune dépendance) |
-| `tambour_mawonaj_portecle.stl` | STL final à imprimer (binaire, 47 288 triangles, ~2,36 Mo) — généré par le script |
+| `tambour_mawonaj_portecle.stl` | STL final à imprimer (binaire, 47 604 triangles, ~2,38 Mo) — généré par le script |
 | `README_impression_Kobra3.md` | Fiche de réglages d'impression Kobra 3 |
 
-## Caractéristiques du modèle
+## Caractéristiques du modèle (v2)
 
-- Dimensions : **35,6 × 29,6 × 43,2 mm** — un vrai porte-clés, pas un bloc plein
+- Dimensions : **35,7 × 29,6 × 43,2 mm** — un vrai porte-clés, pas un bloc plein
 - Volume solide ~20,5 cm³ → environ **8–9 g en PLA à 20 % de remplissage**
-- Fût galbé, 8 cordes de tension, bandes et chevrons décoratifs, peau bombée, cerclage métallique, boucle porte-clés horizontale
-- Inscription **MAWONAJ** en relief 1,2 mm épousant la courbure du fût (vérifiée lettre par lettre dans le maillage)
+- Fût galbé, 8 cordons de tension ondulés, **double bande décorative en bas**, **deux rangées de chevrons**, peau bombée, cerclage métallique
+- **Crochet intégré** : bras épais (5,6 mm) ancré dans le fût (pénètre la paroi de 3 mm), aminci vers la boucle porte-clés horizontale (Ø ~9,6 mm, passage mousqueton standard)
+- Inscription **« Mawonaj » en script** (traits cursifs, M majuscule) en relief 1,2 mm épousant la courbure du fût
 - Maillage **étanche** (watertight, 0 arête ouverte)
-- **Aucun support nécessaire** : impression à plat, peau vers le haut
+- **Aucun support nécessaire** : impression à plat, peau vers le haut, boucle horizontale
 
 ## Régénérer le STL
 
@@ -25,7 +26,7 @@ Projet de fichier STL imprimable en 3D : tambour antillais (gwoka) en porte-clé
 python3 gen_tambour.py
 ```
 
-Pour changer l'inscription, modifier `TEXT = "MAWONAJ"` dans `gen_tambour.py`.
+Pour changer l'inscription, modifier `TEXT = "Mawonaj"` dans `gen_tambour.py` (les glyphes script sont dans le dictionnaire `SCRIPT`).
 
 ## Impression (Anycubic Kobra 3)
 
