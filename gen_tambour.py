@@ -13,7 +13,7 @@ R_HAUT   = 15.0 * SCALE    # rayon en haut (sous la peau)
 BULGE    = 4.5 * SCALE     # bombe maximal du fut
 DOME     = 1.7 * SCALE     # bombe de la peau (bien visible, uniforme)
 N_CORDES = 8
-CORDE_AMP = 0.55 * SCALE   # cordons un peu plus marques
+CORDE_AMP = 0.40 * SCALE   # cordons de tension (relief) — les ficelles de laçage remplacent les grosses ondulations
 NT = 160           # resolution angulaire
 NZ = 96            # resolution verticale du fut
 N_RING_PEAU = 32
@@ -45,14 +45,15 @@ BOUCLE_TUBE = 1.3    # section du tore
 BOUCLE_Z    = H - 1.2            # hauteur du centre de la boucle (dans la paroi haute)
 BOUCLE_CX   = R_HAUT + 3.55      # deport : le tore mord dans le fut, le trou reste degage
 
-# Tendeurs de peau : petits piquets inclines autour du cerclage (style tambour ka)
-N_TEND   = 8
-TEND_LEN = 4.5                 # longueur (mm)
-TEND_R0  = 1.0                 # rayon a la base
-TEND_R1  = 0.5                 # rayon a la pointe
-TEND_TILT = math.radians(35)   # inclinaison depuis la verticale (<45 deg => sans support)
-TEND_Z   = H - 0.5             # ancres dans la paroi haute
-TEND_R   = R_HAUT - 0.5
+# Ficelles de laçage (tendeurs) : apparentes sur le cote du fut, descendant de la peau
+N_LACE     = 8
+LACE_ZTOP  = H - 1.0       # depart sous le cerclage
+LACE_ZBOT  = 3.4           # arrivee au-dessus de la bande basse
+LACE_HW_MM = 0.40          # demi-largeur de la ficelle (mm)
+LACE_RELIEF = 0.5          # relief de la ficelle (mm)
+LACE_ZIG   = 3             # nombre de zigzags
+LACE_AMP   = 0.30          # amplitude angulaire du zigzag (rad)
+LACE_BOW   = 0.78          # les ficelles contournent la zone du texte (rad)
 
 # ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
 def _arc(cx, cy, r, a0, a1, n=16):
@@ -150,34 +151,40 @@ def add_cylindre(mesh, r, z0, z1, n=28):
         mesh.tri(cb, bas[i2], bas[i])
         mesh.tri(ch, haut[i], haut[i2])
 
-def add_peg(mesh, theta, r_base, z_base, length, rad0, rad1, tilt):
-    """Tendeur de peau : piquet conique incline, ancre dans la paroi, pointe vers le haut."""
-    d = (math.cos(theta)*math.sin(tilt), math.sin(theta)*math.sin(tilt), math.cos(tilt))
-    u = (-math.sin(theta), math.cos(theta), 0.0)
-    v = cross(d, u)
-    ln = math.sqrt(dot(v, v)) or 1.0
-    v = (v[0]/ln, v[1]/ln, v[2]/ln)
-    bx, by, bz = r_base*math.cos(theta), r_base*math.sin(theta), z_base
-    n, m_ = 20, 12
-    rings = []
+def _strip_surface(m, centers, relief):
+    """Bande en relief le long d'une ligne (a, z, hw) sur la surface du fut."""
+    Lin, Lout, Rin, Rout = [], [], [], []
+    for (a, z, hw) in centers:
+        rs = radius(a, z)
+        ro = rs + relief
+        for s, arr_i, arr_o in ((1, Lin, Lout), (-1, Rin, Rout)):
+            aa = a + s * hw
+            arr_i.append(m.v(rs*math.cos(aa), rs*math.sin(aa), z))
+            arr_o.append(m.v(ro*math.cos(aa), ro*math.sin(aa), z))
+    n = len(centers)
+    for i in range(n-1):
+        m.quad(Lout[i], Rout[i], Rout[i+1], Lout[i+1])   # dessus
+        m.quad(Lin[i], Lin[i+1], Rin[i+1], Rin[i])       # dessous
+        m.quad(Lin[i], Lout[i], Lout[i+1], Lin[i+1])     # paroi gauche
+        m.quad(Rin[i], Rin[i+1], Rout[i+1], Rout[i])     # paroi droite
+    m.quad(Lin[0], Lout[0], Rout[0], Rin[0])
+    m.quad(Lin[n-1], Lout[n-1], Rout[n-1], Rin[n-1])
+
+def add_lace(m, th0, phase):
+    """Ficelle de laçage en zigzag descendant de la peau, contourne la zone du texte."""
+    n = 72
+    centers = []
     for i in range(n+1):
         t = i / n
-        cx, cy, cz = bx + d[0]*length*t, by + d[1]*length*t, bz + d[2]*length*t
-        rad = rad0 + (rad1 - rad0) * t
-        rings.append([mesh.v(cx + (u[0]*math.cos(2*math.pi*j/m_) + v[0]*math.sin(2*math.pi*j/m_))*rad,
-                             cy + (u[1]*math.cos(2*math.pi*j/m_) + v[1]*math.sin(2*math.pi*j/m_))*rad,
-                             cz + (u[2]*math.cos(2*math.pi*j/m_) + v[2]*math.sin(2*math.pi*j/m_))*rad)
-                      for j in range(m_)])
-    cb = mesh.v(bx, by, bz)
-    ct = mesh.v(bx + d[0]*length, by + d[1]*length, bz + d[2]*length)
-    for i in range(n):
-        for j in range(m_):
-            j2 = (j+1) % m_
-            mesh.quad(rings[i][j], rings[i][j2], rings[i+1][j2], rings[i+1][j])
-    for j in range(m_):
-        j2 = (j+1) % m_
-        mesh.tri(cb, rings[0][j2], rings[0][j])
-        mesh.tri(ct, rings[n][j], rings[n][j2])
+        z = LACE_ZTOP + (LACE_ZBOT - LACE_ZTOP) * t
+        ph = (LACE_ZIG * 2) * t + phase
+        tri = abs((ph % 2.0) - 1.0)
+        a = th0 + LACE_AMP * (1.0 - 2.0 * tri)
+        if TXT_ZONE[0] <= z <= TXT_ZONE[1]:   # la ficelle contourne le texte
+            a = math.copysign(max(abs(a), LACE_BOW), a)
+        r = radius(a, z)
+        centers.append((a, z, LACE_HW_MM / r))
+    _strip_surface(m, centers, LACE_RELIEF)
 
 def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
     """Extrude un trait (polyligne en unites de glyphe) en relief courbe sur le fut."""
@@ -260,10 +267,9 @@ def build():
             m.quad(a, b, c, d)
     add_tore(m, TORE_CERC_Z, TORE_CERC_R, TORE_CERC_TUBE, 24, 96)
     add_tore(m, TORE_CERC_Z + 0.35*SCALE, TORE_CERC_R - 0.2*SCALE, 0.5*SCALE, 24, 72)  # second cerclage fin
-    # tendeurs de peau autour du cerclage (entre les cordons)
-    for i in range(N_TEND):
-        th = 2 * math.pi * (i + 0.5) / N_TEND
-        add_peg(m, th, TEND_R, TEND_Z, TEND_LEN, TEND_R0, TEND_R1, TEND_TILT)
+    # ficelles de laçage apparentes descendant de la peau (entre les cordons)
+    for i in range(N_LACE):
+        add_lace(m, 2 * math.pi * (i + 0.5) / N_LACE, (i % 2) * 0.5)
     # --- crochet integre directement a la face du tambour : boucle seule, ---
     # --- le tore penetre la paroi haute du fut (pas de bras) ---
     add_tore(m, BOUCLE_Z, BOUCLE_R, BOUCLE_TUBE, 26, 64, cx=BOUCLE_CX)

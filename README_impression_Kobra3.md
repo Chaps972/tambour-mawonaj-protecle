@@ -2,15 +2,16 @@
 ## Fiche d'impression pour Anycubic Kobra 3
 
 ## Fichier
-- `tambour_mawonaj_portecle.stl` (STL binaire, 56 920 triangles, maillage ferme/watertight)
-- Dimensions : **35,0 × 29,3 × 39,5 mm** (hauteur totale avec tendeurs)
+- `tambour_mawonaj_portecle.stl` (STL binaire, 57 528 triangles, maillage ferme/watertight)
+- Dimensions : **35,2 × 29,7 × 37,3 mm** (hauteur totale avec boucle)
 - Volume solide : 20,9 cm³ → à 20 % de remplissage ≈ **8–9 g de filament**, ~40–50 min d'impression
 
 ## Le modèle
-- Fût bombé façon tambour ka/bèlè, Ø max ~29 mm, hauteur fût 36 mm
-- 8 cordons de tension ondulés, double bande décorative en bas, deux rangées de chevrons, bande haute
-- **Peau bombée uniforme** avec double cerclage métallique et **8 tendeurs de peau** coniques autour du haut (inclinés à 35°, sans support)
-- Inscription **« Mawonaj » en script épais** (M majuscule) en relief 1,35 mm, traits ~0,9 mm, courbée sur le fût
+- Fût bombé façon tambour ka/bèlè, Ø max ~29,7 mm, hauteur fût 36 mm
+- Double bande décorative en bas, deux rangées de chevrons, bande haute
+- **Peau bombée uniforme** avec double cerclage métallique
+- **8 ficelles de laçage apparentes** en relief (~0,8 mm de Ø) descendant de la peau en zigzag jusqu'à la bande basse, en contournant le texte
+- Inscription **« Mawonaj » en script épais** (M majuscule) en relief 1,35 mm, traits ~0,9 mm
 - **Crochet intégré à la face du tambour** : boucle horizontale soudée dans la paroi haute (Ø trou ~5,8 mm), aucun bras
 - **Aucun support nécessaire**
 
@@ -31,9 +32,9 @@
 
 ## Conseils
 - Texte script : relief 1,35 mm ≈ 11 couches à 0,12 mm, traits ~0,9 mm → bien lisibles.
-- Vérifier l'échelle à l'import : 35,0 × 29,3 × 39,5 mm.
-- Option « ironing » sur la peau (dessus) et sur la face du texte pour un rendu lisse.
-- Tendeurs inclinés à 35° de la verticale : pas de support requis.
+- Ficelles de laçage : Ø ~0,8 mm ≈ 6–7 couches → visibles et solides.
+- Vérifier l'échelle à l'import : 35,2 × 29,7 × 37,3 mm.
+- Option « ironing » sur la peau (dessus) et sur la face du texte.
 
 ## Filament
 - **PLA** (rigide, simple), **PLA Silk/bois** (rendu chaud), **PETG** (chocs).
