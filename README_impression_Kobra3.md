@@ -2,17 +2,17 @@
 ## Fiche d'impression pour Anycubic Kobra 3
 
 ## Fichier
-- `tambour_mawonaj_portecle.stl` (STL binaire, 47 592 triangles, maillage ferme/watertight)
-- Dimensions : **35,1 × 29,6 × 37,1 mm** (hauteur totale avec boucle)
-- Volume solide : 20,7 cm³ → à 20 % de remplissage ≈ **8–9 g de filament**, ~35–45 min d'impression
+- `tambour_mawonaj_portecle.stl` (STL binaire, 56 920 triangles, maillage ferme/watertight)
+- Dimensions : **35,0 × 29,3 × 39,5 mm** (hauteur totale avec tendeurs)
+- Volume solide : 20,9 cm³ → à 20 % de remplissage ≈ **8–9 g de filament**, ~40–50 min d'impression
 
 ## Le modèle
-- Fût bombé façon tambour ka/bèlè, Ø max ~29,6 mm, hauteur fût 36 mm
+- Fût bombé façon tambour ka/bèlè, Ø max ~29 mm, hauteur fût 36 mm
 - 8 cordons de tension ondulés, double bande décorative en bas, deux rangées de chevrons, bande haute
-- Peau bombée avec cerclage métallique
-- Inscription **« Mawonaj » en script** (M majuscule, lettres cursives) en relief (1,2 mm) courbée sur le fût
-- **Crochet directement intégré à la face du tambour** : boucle horizontale soudée dans la paroi haute du fût (Ø trou ~5,8 mm), aucun bras
-- **Aucun support nécessaire** : la boucle est horizontale
+- **Peau bombée uniforme** avec double cerclage métallique et **8 tendeurs de peau** coniques autour du haut (inclinés à 35°, sans support)
+- Inscription **« Mawonaj » en script épais** (M majuscule) en relief 1,35 mm, traits ~0,9 mm, courbée sur le fût
+- **Crochet intégré à la face du tambour** : boucle horizontale soudée dans la paroi haute (Ø trou ~5,8 mm), aucun bras
+- **Aucun support nécessaire**
 
 ## Réglages recommandés (Anycubic Slicer / Kobra 3)
 | Paramètre | Valeur |
@@ -29,11 +29,11 @@
 | Brim | 3–4 mm |
 | Orientation | à plat, peau vers le haut (Z+) |
 
-## Conseils texte « Mawonaj » (script)
-- Relief 1,2 mm = 10 couches à 0,12 mm → bien défini.
-- Traits du script ~0,5 mm de large → lisibles à cette résolution.
-- Vérifier l'échelle à l'import : 35,1 × 29,6 × 37,1 mm.
-- Option « ironing » sur la face avant du fût pour lisser le relief.
+## Conseils
+- Texte script : relief 1,35 mm ≈ 11 couches à 0,12 mm, traits ~0,9 mm → bien lisibles.
+- Vérifier l'échelle à l'import : 35,0 × 29,3 × 39,5 mm.
+- Option « ironing » sur la peau (dessus) et sur la face du texte pour un rendu lisse.
+- Tendeurs inclinés à 35° de la verticale : pas de support requis.
 
 ## Filament
 - **PLA** (rigide, simple), **PLA Silk/bois** (rendu chaud), **PETG** (chocs).

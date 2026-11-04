@@ -11,28 +11,28 @@ H        = 48.0 * SCALE    # hauteur du fut
 R_BAS    = 16.0 * SCALE    # rayon en bas
 R_HAUT   = 15.0 * SCALE    # rayon en haut (sous la peau)
 BULGE    = 4.5 * SCALE     # bombe maximal du fut
-DOME     = 0.9 * SCALE     # bombe de la peau
+DOME     = 1.7 * SCALE     # bombe de la peau (bien visible, uniforme)
 N_CORDES = 8
 CORDE_AMP = 0.55 * SCALE   # cordons un peu plus marques
 NT = 160           # resolution angulaire
 NZ = 96            # resolution verticale du fut
-N_RING_PEAU = 26
+N_RING_PEAU = 32
 
 BANDE_BAS  = (1.6, 4.0, 0.75)
 BANDE_BAS  = (BANDE_BAS[0]*SCALE, BANDE_BAS[1]*SCALE, BANDE_BAS[2]*SCALE)
 BANDE_BAS2 = (0.5, 1.3, 0.45)   # seconde bande basse (plus de details)
 BANDE_BAS2 = (BANDE_BAS2[0]*SCALE, BANDE_BAS2[1]*SCALE, BANDE_BAS2[2]*SCALE)
 BANDE_HAUT = ((H - 6.0*SCALE), (H - 3.6*SCALE), 0.75*SCALE)
-CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV = 0.28*H, 0.42*H, 0.85*SCALE, 8
-CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.55*H, 0.72*H, 0.70*SCALE, 8  # 2e rangee de chevrons
+CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV = 0.24*H, 0.36*H, 0.85*SCALE, 8
+CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.60*H, 0.76*H, 0.70*SCALE, 8  # 2e rangee de chevrons
 
 TEXT       = "Mawonaj"   # script, M majuscule
-TXT_ZBOT   = 0.470 * H
-TXT_W      = 0.60 * SCALE
-TXT_H      = 0.62 * SCALE
-TXT_RELIEF = 1.6 * SCALE
-TXT_HW     = 0.55          # demi-largeur des traits (en unites de glyphe)
-TXT_ZONE   = (TXT_ZBOT - 2.4*TXT_H - 0.4, TXT_ZBOT + 7.4*TXT_H + 0.4)
+TXT_ZBOT   = 0.44 * H
+TXT_W      = 0.85 * SCALE   # texte nettement plus gros
+TXT_H      = 0.85 * SCALE
+TXT_RELIEF = 1.8 * SCALE    # relief plus prononce
+TXT_HW     = 0.72          # traits plus epais (w bien lisible)
+TXT_ZONE   = (TXT_ZBOT - 2.6*TXT_H - 0.6, TXT_ZBOT + 7.6*TXT_H + 0.6)
 
 TORE_CERC_R    = R_HAUT + 0.55 * SCALE
 TORE_CERC_TUBE = 1.25 * SCALE
@@ -45,6 +45,15 @@ BOUCLE_TUBE = 1.3    # section du tore
 BOUCLE_Z    = H - 1.2            # hauteur du centre de la boucle (dans la paroi haute)
 BOUCLE_CX   = R_HAUT + 3.55      # deport : le tore mord dans le fut, le trou reste degage
 
+# Tendeurs de peau : petits piquets inclines autour du cerclage (style tambour ka)
+N_TEND   = 8
+TEND_LEN = 4.5                 # longueur (mm)
+TEND_R0  = 1.0                 # rayon a la base
+TEND_R1  = 0.5                 # rayon a la pointe
+TEND_TILT = math.radians(35)   # inclinaison depuis la verticale (<45 deg => sans support)
+TEND_Z   = H - 0.5             # ancres dans la paroi haute
+TEND_R   = R_HAUT - 0.5
+
 # ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
 def _arc(cx, cy, r, a0, a1, n=16):
     return [(cx + r*math.cos(a0 + (a1-a0)*i/n), cy + r*math.sin(a0 + (a1-a0)*i/n)) for i in range(n+1)]
@@ -53,7 +62,7 @@ _R = math.radians
 SCRIPT = {
  'M': [[(0.0,0.2),(0.15,2.6),(0.5,5.4),(0.95,7.0),(1.5,4.4),(1.9,1.6),(2.3,5.2),(2.75,7.0),(3.25,4.0),(3.65,0.4),(4.4,0.0)]],
  'a': [_arc(1.5,2.6,1.8, _R(75), _R(75)-2*math.pi, 20) + [(3.3,4.5),(3.3,0.3),(3.95,-0.2)]],
- 'w': [[(0.0,4.6),(0.8,0.2),(1.6,4.4),(2.4,0.2),(3.2,4.6)]],
+ 'w': [[(0.0,4.6),(0.9,0.2),(1.8,4.5),(2.7,0.2),(3.6,4.6)]],
  'o': [_arc(1.8,2.6,1.8, _R(90), _R(90)-2*math.pi, 20) + [(1.8,4.4),(2.7,4.7)]],
  'n': [[(0.0,4.6),(0.3,2.2),(0.45,0.2),(1.0,3.4),(1.7,4.6),(2.2,2.2),(2.5,0.2),(3.15,3.8)]],
  'j': [_arc(1.0,6.1,0.45, 0, -2*math.pi, 10),
@@ -88,11 +97,11 @@ def radius(theta, z):
             ph = ((nch * theta / (2 * math.pi)) + phase) % 1.0
             tri = 2 * ph if ph < 0.5 else 2 * (1 - ph)
             lissage = math.sin(math.pi * (z - z0) / (z1 - z0))
-            r += amp * tri * lissage
+            r += amp * tri * lissage * cf
     return r
 
 def peau_z(r):
-    return H + DOME * (1 - (r / R_HAUT) ** 2) ** 0.65
+    return H + DOME * (1 - (r / R_HAUT) ** 2) ** 0.5
 
 class Mesh:
     def __init__(self):
@@ -140,6 +149,35 @@ def add_cylindre(mesh, r, z0, z1, n=28):
         mesh.quad(bas[i], bas[i2], haut[i2], haut[i])
         mesh.tri(cb, bas[i2], bas[i])
         mesh.tri(ch, haut[i], haut[i2])
+
+def add_peg(mesh, theta, r_base, z_base, length, rad0, rad1, tilt):
+    """Tendeur de peau : piquet conique incline, ancre dans la paroi, pointe vers le haut."""
+    d = (math.cos(theta)*math.sin(tilt), math.sin(theta)*math.sin(tilt), math.cos(tilt))
+    u = (-math.sin(theta), math.cos(theta), 0.0)
+    v = cross(d, u)
+    ln = math.sqrt(dot(v, v)) or 1.0
+    v = (v[0]/ln, v[1]/ln, v[2]/ln)
+    bx, by, bz = r_base*math.cos(theta), r_base*math.sin(theta), z_base
+    n, m_ = 20, 12
+    rings = []
+    for i in range(n+1):
+        t = i / n
+        cx, cy, cz = bx + d[0]*length*t, by + d[1]*length*t, bz + d[2]*length*t
+        rad = rad0 + (rad1 - rad0) * t
+        rings.append([mesh.v(cx + (u[0]*math.cos(2*math.pi*j/m_) + v[0]*math.sin(2*math.pi*j/m_))*rad,
+                             cy + (u[1]*math.cos(2*math.pi*j/m_) + v[1]*math.sin(2*math.pi*j/m_))*rad,
+                             cz + (u[2]*math.cos(2*math.pi*j/m_) + v[2]*math.sin(2*math.pi*j/m_))*rad)
+                      for j in range(m_)])
+    cb = mesh.v(bx, by, bz)
+    ct = mesh.v(bx + d[0]*length, by + d[1]*length, bz + d[2]*length)
+    for i in range(n):
+        for j in range(m_):
+            j2 = (j+1) % m_
+            mesh.quad(rings[i][j], rings[i][j2], rings[i+1][j2], rings[i+1][j])
+    for j in range(m_):
+        j2 = (j+1) % m_
+        mesh.tri(cb, rings[0][j2], rings[0][j])
+        mesh.tri(ct, rings[n][j], rings[n][j2])
 
 def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
     """Extrude un trait (polyligne en unites de glyphe) en relief courbe sur le fut."""
@@ -221,10 +259,14 @@ def build():
             a, b, c, d = rings[k][i], rings[k+1][i], rings[k+1][i2], rings[k][i2]
             m.quad(a, b, c, d)
     add_tore(m, TORE_CERC_Z, TORE_CERC_R, TORE_CERC_TUBE, 24, 96)
+    add_tore(m, TORE_CERC_Z + 0.35*SCALE, TORE_CERC_R - 0.2*SCALE, 0.5*SCALE, 24, 72)  # second cerclage fin
+    # tendeurs de peau autour du cerclage (entre les cordons)
+    for i in range(N_TEND):
+        th = 2 * math.pi * (i + 0.5) / N_TEND
+        add_peg(m, th, TEND_R, TEND_Z, TEND_LEN, TEND_R0, TEND_R1, TEND_TILT)
     # --- crochet integre directement a la face du tambour : boucle seule, ---
     # --- le tore penetre la paroi haute du fut (pas de bras) ---
     add_tore(m, BOUCLE_Z, BOUCLE_R, BOUCLE_TUBE, 26, 64, cx=BOUCLE_CX)
-    add_cylindre(m, 2.6, H - 0.8, H + 0.15, n=20)
     add_texte(m, TEXT, TXT_ZBOT, TXT_W, TXT_H, TXT_RELIEF)
     return m
 
