@@ -33,6 +33,7 @@ TXT_H      = 0.85 * SCALE
 TXT_RELIEF = 1.8 * SCALE    # relief plus prononce
 TXT_HW     = 0.72          # traits plus epais (w bien lisible)
 TXT_ZONE   = (TXT_ZBOT - 2.6*TXT_H - 0.6, TXT_ZBOT + 7.6*TXT_H + 0.6)
+TEXT_THETA = math.pi        # inscription a l'OPPOSE du crochet (crochet a theta = 0)
 
 TORE_CERC_R    = R_HAUT + 0.55 * SCALE
 TORE_CERC_TUBE = 1.25 * SCALE
@@ -87,7 +88,11 @@ def radius(theta, z):
     t = z / H
     r = R_BAS + (R_HAUT - R_BAS) * t + BULGE * math.sin(math.pi * t) ** 1.5 * (1 - 0.35 * t)
     att = math.sin(math.pi * t) ** 2
-    cf = 0.10 if (TXT_ZONE[0] <= z <= TXT_ZONE[1]) else 1.0
+    if TXT_ZONE[0] <= z <= TXT_ZONE[1]:
+        dth = ((theta - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
+        cf = 0.10 if abs(dth) < 0.85 else 1.0   # lissage local autour du texte
+    else:
+        cf = 1.0
     r += CORDE_AMP * att * cf * math.cos(N_CORDES * theta)
     r += bande(z, *BANDE_BAS)
     r += bande(z, *BANDE_BAS2)
@@ -181,7 +186,9 @@ def add_lace(m, th0, phase):
         tri = abs((ph % 2.0) - 1.0)
         a = th0 + LACE_AMP * (1.0 - 2.0 * tri)
         if TXT_ZONE[0] <= z <= TXT_ZONE[1]:   # la ficelle contourne le texte
-            a = math.copysign(max(abs(a), LACE_BOW), a)
+            d = ((a - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
+            if abs(d) < LACE_BOW:
+                a = TEXT_THETA + math.copysign(LACE_BOW, d if abs(d) > 1e-6 else 1.0)
         r = radius(a, z)
         centers.append((a, z, LACE_HW_MM / r))
     _strip_surface(m, centers, LACE_RELIEF)
@@ -207,7 +214,7 @@ def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
         for (sx, out) in ((1, 'L'), (-1, 'R')):
             gx = x_off + px + sx*ox
             gy = py + sx*oy
-            a = th0 + (gx * w) / r_loc
+            a = TEXT_THETA + th0 + (gx * w) / r_loc
             z = z_bot + gy * h
             rs = radius(a, z)
             ro = rs + relief
@@ -226,7 +233,7 @@ def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
     m.quad(Lin[n-1], Lout[n-1], Rout[n-1], Rin[n-1])        # cap fin
 
 def add_texte(m, text, z_bot, w, h, relief):
-    r_loc = radius(0.0, z_bot + 3.5 * h)
+    r_loc = radius(TEXT_THETA, z_bot + 3.5 * h)
     total_units = sum(_adv(ch) for ch in text)
     th0 = -(total_units * w / 2) / r_loc
     x_off = 0.0

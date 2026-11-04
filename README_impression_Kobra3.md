@@ -3,7 +3,7 @@
 
 ## Fichier
 - `tambour_mawonaj_portecle.stl` (STL binaire, 57 528 triangles, maillage ferme/watertight)
-- Dimensions : **35,2 × 29,7 × 37,3 mm** (hauteur totale avec boucle)
+- Dimensions : **36,1 × 30,0 × 37,3 mm** (hauteur totale avec boucle)
 - Volume solide : 20,9 cm³ → à 20 % de remplissage ≈ **8–9 g de filament**, ~40–50 min d'impression
 
 ## Le modèle
@@ -12,7 +12,7 @@
 - **Peau bombée uniforme** avec double cerclage métallique
 - **8 ficelles de laçage apparentes** en relief (~0,8 mm de Ø) descendant de la peau en zigzag jusqu'à la bande basse, en contournant le texte
 - Inscription **« Mawonaj » en script épais** (M majuscule) en relief 1,35 mm, traits ~0,9 mm
-- **Crochet intégré à la face du tambour** : boucle horizontale soudée dans la paroi haute (Ø trou ~5,8 mm), aucun bras
+- **Crochet intégré à la face du tambour** : boucle horizontale soudée dans la paroi haute (Ø trou ~5,8 mm), aucun bras — **inscription à l'opposé (180°) du crochet**
 - **Aucun support nécessaire**
 
 ## Réglages recommandés (Anycubic Slicer / Kobra 3)
@@ -33,7 +33,7 @@
 ## Conseils
 - Texte script : relief 1,35 mm ≈ 11 couches à 0,12 mm, traits ~0,9 mm → bien lisibles.
 - Ficelles de laçage : Ø ~0,8 mm ≈ 6–7 couches → visibles et solides.
-- Vérifier l'échelle à l'import : 35,2 × 29,7 × 37,3 mm.
+- Vérifier l'échelle à l'import : 36,1 × 30,0 × 37,3 mm.
 - Option « ironing » sur la peau (dessus) et sur la face du texte.
 
 ## Filament
