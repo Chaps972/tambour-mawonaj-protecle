@@ -44,8 +44,8 @@ TORE_CERC_Z    = H + 0.25 * SCALE
 # aucun support). Le trou reste degage.
 BOUCLE_R    = 4.2    # rayon de la boucle
 BOUCLE_TUBE = 1.3    # section du tore
-BOUCLE_Z    = 4.2              # centre de la boucle en bas du fut
-BOUCLE_CX   = R_HAUT + 4.95    # deport : le tore mord dans le fut, le trou reste degage
+BOUCLE_Z    = BOUCLE_TUBE      # boucle a la BASE meme du fut : repose sur le plateau (z=0), zero bavure
+BOUCLE_CX   = R_HAUT + 4.95    # deport : le tore mord dans la base du fut, le trou reste degage
 
 # Ficelles de laçage (tendeurs) : apparentes sur le cote du fut, descendant de la peau
 N_LACE     = 8
