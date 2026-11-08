@@ -12,7 +12,7 @@
 - **Peau bombée uniforme et nette** (dôme 1,5 mm) avec double cerclage métallique
 - **8 ficelles de laçage apparentes** en relief (~0,8 mm de Ø) descendant de la peau en zigzag jusqu'à la bande basse, en contournant le texte
 - Inscription **« Mawonaj » en script très épais** (M majuscule) en relief 1,65 mm, traits ~1,25 mm
-- **Crochet EN BAS soudé à la paroi basse du fût** : boucle horizontale (Ø trou ~5,8 mm), aucun bras — **aucun support** (la base plate repose sur le plateau, peau vers le haut) — **inscription à l'opposé (180°)**
+- **Crochet EN BAS soudé à la paroi basse du fût** : boucle horizontale **à la base (z=0, posée sur le plateau, zéro bavure)** (Ø trou ~5,8 mm), aucun bras — **aucun support** (la base plate repose sur le plateau, peau vers le haut) — **inscription à l'opposé (180°)**
 - **Aucun support nécessaire**
 
 ## Réglages recommandés (Anycubic Slicer / Kobra 3)
