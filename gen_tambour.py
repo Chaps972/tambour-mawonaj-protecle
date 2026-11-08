@@ -11,27 +11,27 @@ H        = 48.0 * SCALE    # hauteur du fut
 R_BAS    = 16.0 * SCALE    # rayon en bas
 R_HAUT   = 15.0 * SCALE    # rayon en haut (sous la peau)
 BULGE    = 4.5 * SCALE     # bombe maximal du fut
-DOME     = 1.7 * SCALE     # bombe de la peau (bien visible, uniforme)
+DOME     = 2.0 * SCALE     # bombe de la peau (bien visible, uniforme, nette)
 N_CORDES = 8
 CORDE_AMP = 0.40 * SCALE   # cordons de tension (relief) — les ficelles de laçage remplacent les grosses ondulations
 NT = 160           # resolution angulaire
 NZ = 96            # resolution verticale du fut
-N_RING_PEAU = 32
+N_RING_PEAU = 40
 
 BANDE_BAS  = (1.6, 4.0, 0.75)
 BANDE_BAS  = (BANDE_BAS[0]*SCALE, BANDE_BAS[1]*SCALE, BANDE_BAS[2]*SCALE)
 BANDE_BAS2 = (0.5, 1.3, 0.45)   # seconde bande basse (plus de details)
 BANDE_BAS2 = (BANDE_BAS2[0]*SCALE, BANDE_BAS2[1]*SCALE, BANDE_BAS2[2]*SCALE)
 BANDE_HAUT = ((H - 6.0*SCALE), (H - 3.6*SCALE), 0.75*SCALE)
-CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV = 0.24*H, 0.36*H, 0.85*SCALE, 8
-CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.60*H, 0.76*H, 0.70*SCALE, 8  # 2e rangee de chevrons
+CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV = 0.22*H, 0.33*H, 0.85*SCALE, 8
+CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.62*H, 0.78*H, 0.70*SCALE, 8  # 2e rangee de chevrons
 
 TEXT       = "Mawonaj"   # script, M majuscule
-TXT_ZBOT   = 0.44 * H
-TXT_W      = 0.85 * SCALE   # texte nettement plus gros
-TXT_H      = 0.85 * SCALE
-TXT_RELIEF = 1.8 * SCALE    # relief plus prononce
-TXT_HW     = 0.72          # traits plus epais (w bien lisible)
+TXT_ZBOT   = 0.40 * H
+TXT_W      = 1.05 * SCALE   # texte encore plus gros
+TXT_H      = 1.05 * SCALE
+TXT_RELIEF = 2.2 * SCALE    # relief bien prononce
+TXT_HW     = 0.80          # traits tres epais (w bien lisible)
 TXT_ZONE   = (TXT_ZBOT - 2.6*TXT_H - 0.6, TXT_ZBOT + 7.6*TXT_H + 0.6)
 TEXT_THETA = math.pi        # inscription a l'OPPOSE du crochet (crochet a theta = 0)
 
@@ -39,22 +39,23 @@ TORE_CERC_R    = R_HAUT + 0.55 * SCALE
 TORE_CERC_TUBE = 1.25 * SCALE
 TORE_CERC_Z    = H + 0.25 * SCALE
 
-# Crochet directement integre a la face du tambour : la boucle (tore horizontal)
-# penetre la paroi superieure du fut, aucun bras intermediaire.
+# Crochet EN BAS, directement integre a la paroi du fut : boucle horizontale
+# soudee dans la paroi basse (cote plateau a l'impression => meilleure definition,
+# aucun support). Le trou reste degage.
 BOUCLE_R    = 4.2    # rayon de la boucle
 BOUCLE_TUBE = 1.3    # section du tore
-BOUCLE_Z    = H - 1.2            # hauteur du centre de la boucle (dans la paroi haute)
-BOUCLE_CX   = R_HAUT + 3.55      # deport : le tore mord dans le fut, le trou reste degage
+BOUCLE_Z    = 4.2              # centre de la boucle en bas du fut
+BOUCLE_CX   = R_HAUT + 4.95    # deport : le tore mord dans le fut, le trou reste degage
 
 # Ficelles de laçage (tendeurs) : apparentes sur le cote du fut, descendant de la peau
 N_LACE     = 8
 LACE_ZTOP  = H - 1.0       # depart sous le cerclage
-LACE_ZBOT  = 3.4           # arrivee au-dessus de la bande basse
+LACE_ZBOT  = 5.8           # arrivee au-dessus de la boucle basse
 LACE_HW_MM = 0.40          # demi-largeur de la ficelle (mm)
 LACE_RELIEF = 0.5          # relief de la ficelle (mm)
 LACE_ZIG   = 3             # nombre de zigzags
 LACE_AMP   = 0.30          # amplitude angulaire du zigzag (rad)
-LACE_BOW   = 0.78          # les ficelles contournent la zone du texte (rad)
+LACE_BOW   = 1.05          # les ficelles contournent la zone du texte (rad)
 
 # ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
 def _arc(cx, cy, r, a0, a1, n=16):
@@ -64,7 +65,7 @@ _R = math.radians
 SCRIPT = {
  'M': [[(0.0,0.2),(0.15,2.6),(0.5,5.4),(0.95,7.0),(1.5,4.4),(1.9,1.6),(2.3,5.2),(2.75,7.0),(3.25,4.0),(3.65,0.4),(4.4,0.0)]],
  'a': [_arc(1.5,2.6,1.8, _R(75), _R(75)-2*math.pi, 20) + [(3.3,4.5),(3.3,0.3),(3.95,-0.2)]],
- 'w': [[(0.0,4.6),(0.9,0.2),(1.8,4.5),(2.7,0.2),(3.6,4.6)]],
+ 'w': [[(0.0,4.6),(1.0,0.2),(2.0,4.5),(3.0,0.2),(4.0,4.6)]],
  'o': [_arc(1.8,2.6,1.8, _R(90), _R(90)-2*math.pi, 20) + [(1.8,4.4),(2.7,4.7)]],
  'n': [[(0.0,4.6),(0.3,2.2),(0.45,0.2),(1.0,3.4),(1.7,4.6),(2.2,2.2),(2.5,0.2),(3.15,3.8)]],
  'j': [_arc(1.0,6.1,0.45, 0, -2*math.pi, 10),
@@ -90,7 +91,7 @@ def radius(theta, z):
     att = math.sin(math.pi * t) ** 2
     if TXT_ZONE[0] <= z <= TXT_ZONE[1]:
         dth = ((theta - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
-        cf = 0.10 if abs(dth) < 0.85 else 1.0   # lissage local autour du texte
+        cf = 0.10 if abs(dth) < 1.10 else 1.0   # lissage local autour du texte
     else:
         cf = 1.0
     r += CORDE_AMP * att * cf * math.cos(N_CORDES * theta)
@@ -187,8 +188,9 @@ def add_lace(m, th0, phase):
         a = th0 + LACE_AMP * (1.0 - 2.0 * tri)
         if TXT_ZONE[0] <= z <= TXT_ZONE[1]:   # la ficelle contourne le texte
             d = ((a - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
-            if abs(d) < LACE_BOW:
-                a = TEXT_THETA + math.copysign(LACE_BOW, d if abs(d) > 1e-6 else 1.0)
+            bow = LACE_BOW + 0.013 * round(th0 / (2*math.pi) * N_LACE)  # decalage unique par ficelle (evite les sommets communs)
+            if abs(d) < bow:
+                a = TEXT_THETA + math.copysign(bow, d if abs(d) > 1e-6 else 1.0)
         r = radius(a, z)
         centers.append((a, z, LACE_HW_MM / r))
     _strip_surface(m, centers, LACE_RELIEF)

@@ -3,16 +3,16 @@
 
 ## Fichier
 - `tambour_mawonaj_portecle.stl` (STL binaire, 57 528 triangles, maillage ferme/watertight)
-- Dimensions : **36,1 × 30,0 × 37,3 mm** (hauteur totale avec boucle)
+- Dimensions : **37,8 × 30,2 × 37,5 mm** (hauteur totale avec boucle)
 - Volume solide : 20,9 cm³ → à 20 % de remplissage ≈ **8–9 g de filament**, ~40–50 min d'impression
 
 ## Le modèle
 - Fût bombé façon tambour ka/bèlè, Ø max ~29,7 mm, hauteur fût 36 mm
 - Double bande décorative en bas, deux rangées de chevrons, bande haute
-- **Peau bombée uniforme** avec double cerclage métallique
+- **Peau bombée uniforme et nette** (dôme 1,5 mm) avec double cerclage métallique
 - **8 ficelles de laçage apparentes** en relief (~0,8 mm de Ø) descendant de la peau en zigzag jusqu'à la bande basse, en contournant le texte
-- Inscription **« Mawonaj » en script épais** (M majuscule) en relief 1,35 mm, traits ~0,9 mm
-- **Crochet intégré à la face du tambour** : boucle horizontale soudée dans la paroi haute (Ø trou ~5,8 mm), aucun bras — **inscription à l'opposé (180°) du crochet**
+- Inscription **« Mawonaj » en script très épais** (M majuscule) en relief 1,65 mm, traits ~1,25 mm
+- **Crochet EN BAS soudé à la paroi basse du fût** : boucle horizontale (Ø trou ~5,8 mm), aucun bras — **aucun support** (la base plate repose sur le plateau, peau vers le haut) — **inscription à l'opposé (180°)**
 - **Aucun support nécessaire**
 
 ## Réglages recommandés (Anycubic Slicer / Kobra 3)
@@ -31,9 +31,9 @@
 | Orientation | à plat, peau vers le haut (Z+) |
 
 ## Conseils
-- Texte script : relief 1,35 mm ≈ 11 couches à 0,12 mm, traits ~0,9 mm → bien lisibles.
+- Texte script : relief 1,65 mm ≈ 14 couches à 0,12 mm, traits ~1,25 mm → très lisibles.
 - Ficelles de laçage : Ø ~0,8 mm ≈ 6–7 couches → visibles et solides.
-- Vérifier l'échelle à l'import : 36,1 × 30,0 × 37,3 mm.
+- Vérifier l'échelle à l'import : 37,8 × 30,2 × 37,5 mm.
 - Option « ironing » sur la peau (dessus) et sur la face du texte.
 
 ## Filament
