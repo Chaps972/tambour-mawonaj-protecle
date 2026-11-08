@@ -11,7 +11,7 @@
 - Double bande décorative en bas, deux rangées de chevrons, bande haute
 - **Peau bombée uniforme et nette** (dôme 1,5 mm) avec double cerclage métallique
 - **8 ficelles de laçage apparentes** en relief (~0,8 mm de Ø) descendant de la peau en zigzag jusqu'à la bande basse, en contournant le texte
-- Inscription **« Mawonaj » en script très épais** (M majuscule) en relief 1,65 mm, traits ~1,25 mm
+- Inscription **« Mawonaj » en script très épais** (M majuscule) en relief 1,9 mm, traits ~1,6 mm
 - **Crochet EN BAS soudé à la paroi basse du fût** : boucle horizontale **à la base (z=0, posée sur le plateau, zéro bavure)** (Ø trou ~5,8 mm), aucun bras — **aucun support** (la base plate repose sur le plateau, peau vers le haut) — **inscription à l'opposé (180°)**
 - **Aucun support nécessaire**
 
@@ -31,7 +31,7 @@
 | Orientation | à plat, peau vers le haut (Z+) |
 
 ## Conseils
-- Texte script : relief 1,65 mm ≈ 14 couches à 0,12 mm, traits ~1,25 mm → très lisibles.
+- Texte script : relief 1,9 mm, traits ~1,6 mm → très lisibles. Conseil : hauteur de couche 0,08 mm (ou adaptative) pour un texte encore plus net sur la paroi verticale.
 - Ficelles de laçage : Ø ~0,8 mm ≈ 6–7 couches → visibles et solides.
 - Vérifier l'échelle à l'import : 37,8 × 30,2 × 37,5 mm.
 - Option « ironing » sur la peau (dessus) et sur la face du texte.

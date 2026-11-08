@@ -30,8 +30,8 @@ TEXT       = "Mawonaj"   # script, M majuscule
 TXT_ZBOT   = 0.40 * H
 TXT_W      = 1.05 * SCALE   # texte encore plus gros
 TXT_H      = 1.05 * SCALE
-TXT_RELIEF = 2.2 * SCALE    # relief bien prononce
-TXT_HW     = 0.80          # traits tres epais (w bien lisible)
+TXT_RELIEF = 2.5 * SCALE    # relief bien prononce (~1,9 mm)
+TXT_HW     = 1.00          # traits tres epais (~1,6 mm) : lettres nettes, w/n complets
 TXT_ZONE   = (TXT_ZBOT - 2.6*TXT_H - 0.6, TXT_ZBOT + 7.6*TXT_H + 0.6)
 TEXT_THETA = math.pi        # inscription a l'OPPOSE du crochet (crochet a theta = 0)
 
@@ -65,9 +65,9 @@ _R = math.radians
 SCRIPT = {
  'M': [[(0.0,0.2),(0.15,2.6),(0.5,5.4),(0.95,7.0),(1.5,4.4),(1.9,1.6),(2.3,5.2),(2.75,7.0),(3.25,4.0),(3.65,0.4),(4.4,0.0)]],
  'a': [_arc(1.5,2.6,1.8, _R(75), _R(75)-2*math.pi, 20) + [(3.3,4.5),(3.3,0.3),(3.95,-0.2)]],
- 'w': [[(0.0,4.6),(1.0,0.2),(2.0,4.5),(3.0,0.2),(4.0,4.6)]],
+ 'w': [[(0.0,4.6),(0.4,2.2),(0.8,0.3),(1.2,2.2),(1.6,4.4),(2.0,2.2),(2.4,0.3),(2.8,2.2),(3.2,4.6)]],
  'o': [_arc(1.8,2.6,1.8, _R(90), _R(90)-2*math.pi, 20) + [(1.8,4.4),(2.7,4.7)]],
- 'n': [[(0.0,4.6),(0.3,2.2),(0.45,0.2),(1.0,3.4),(1.7,4.6),(2.2,2.2),(2.5,0.2),(3.15,3.8)]],
+ 'n': [[(0.0,4.6),(0.2,2.4),(0.4,0.3),(0.8,2.8),(1.4,4.5),(1.9,2.6),(2.3,0.3),(2.9,3.6)]],
  'j': [_arc(1.0,6.1,0.45, 0, -2*math.pi, 10),
        [(1.0,4.6),(1.0,0.6),(0.7,-0.8),(-0.1,-1.7),(-0.95,-1.25)]],
 }
@@ -91,7 +91,7 @@ def radius(theta, z):
     att = math.sin(math.pi * t) ** 2
     if TXT_ZONE[0] <= z <= TXT_ZONE[1]:
         dth = ((theta - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
-        cf = 0.10 if abs(dth) < 1.10 else 1.0   # lissage local autour du texte
+        cf = 0.10 if abs(dth) < 1.15 else 1.0   # lissage local autour du texte
     else:
         cf = 1.0
     r += CORDE_AMP * att * cf * math.cos(N_CORDES * theta)
@@ -195,8 +195,20 @@ def add_lace(m, th0, phase):
         centers.append((a, z, LACE_HW_MM / r))
     _strip_surface(m, centers, LACE_RELIEF)
 
+def _densify(poly, w, r_loc, max_arc=0.025):
+    """Sous-echantillonne la polyligne pour que le trait epouse la courbure (pas de trous aux angles)."""
+    out = [poly[0]]
+    for i in range(len(poly)-1):
+        (x0, y0), (x1, y1) = poly[i], poly[i+1]
+        arc = math.hypot(x1-x0, y1-y0) * w / r_loc
+        k = max(1, int(math.ceil(arc / max_arc)))
+        for j in range(1, k+1):
+            out.append((x0 + (x1-x0)*j/k, y0 + (y1-y0)*j/k))
+    return out
+
 def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
     """Extrude un trait (polyligne en unites de glyphe) en relief courbe sur le fut."""
+    poly = _densify(poly, w, r_loc)
     n = len(poly)
     # direction en chaque point (moyenne des segments adjacents)
     dirs = []
