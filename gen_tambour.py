@@ -27,11 +27,11 @@ CHEV_Z0, CHEV_Z1, CHEV_AMP, N_CHEV = 0.22*H, 0.33*H, 0.85*SCALE, 8
 CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.62*H, 0.78*H, 0.70*SCALE, 8  # 2e rangee de chevrons
 
 TEXT       = "Mawonaj"   # script, M majuscule
-TXT_ZBOT   = 0.40 * H
-TXT_W      = 1.05 * SCALE   # texte encore plus gros
-TXT_H      = 1.05 * SCALE
-TXT_RELIEF = 2.5 * SCALE    # relief bien prononce (~1,9 mm)
-TXT_HW     = 1.00          # traits tres epais (~1,6 mm) : lettres nettes, w/n complets
+TXT_ZBOT   = 0.36 * H
+TXT_W      = 1.05 * SCALE
+TXT_H      = 1.35 * SCALE   # lettres plus hautes (~7 mm)
+TXT_RELIEF = 2.8 * SCALE    # relief ~2,1 mm
+TXT_HW     = 1.15           # traits ~1,8 mm : lettres nettes, w/n complets
 TXT_ZONE   = (TXT_ZBOT - 2.6*TXT_H - 0.6, TXT_ZBOT + 7.6*TXT_H + 0.6)
 TEXT_THETA = math.pi        # inscription a l'OPPOSE du crochet (crochet a theta = 0)
 
@@ -51,10 +51,10 @@ BOUCLE_CX   = R_HAUT + 4.95    # deport : le tore mord dans la base du fut, le t
 N_LACE     = 8
 LACE_ZTOP  = H - 1.0       # depart sous le cerclage
 LACE_ZBOT  = 5.8           # arrivee au-dessus de la boucle basse
-LACE_HW_MM = 0.40          # demi-largeur de la ficelle (mm)
-LACE_RELIEF = 0.5          # relief de la ficelle (mm)
-LACE_ZIG   = 3             # nombre de zigzags
-LACE_AMP   = 0.30          # amplitude angulaire du zigzag (rad)
+LACE_HW_MM = 0.45          # demi-largeur de la ficelle (mm)
+LACE_RELIEF = 0.55         # relief de la ficelle (mm)
+TICK_DZ    = 4.5           # espacement des accroches horizontales (mm)
+TICK_LEN   = 3.2           # longueur des accroches horizontales (mm)
 LACE_BOW   = 1.05          # les ficelles contournent la zone du texte (rad)
 
 # ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
@@ -176,24 +176,40 @@ def _strip_surface(m, centers, relief):
     m.quad(Lin[0], Lout[0], Rout[0], Rin[0])
     m.quad(Lin[n-1], Lout[n-1], Rout[n-1], Rin[n-1])
 
-def add_lace(m, th0, phase):
-    """Ficelle de laçage en zigzag descendant de la peau, contourne la zone du texte."""
+def _lace_angle(th0, z):
+    """Angle de la ficelle a la hauteur z : vertical, contourne la zone du texte."""
+    a = th0
+    if TXT_ZONE[0] <= z <= TXT_ZONE[1]:
+        d = ((a - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
+        bow = LACE_BOW + 0.013 * round(th0 / (2*math.pi) * N_LACE)  # decalage unique par ficelle
+        if abs(d) < bow:
+            a = TEXT_THETA + math.copysign(bow, d if abs(d) > 1e-6 else 1.0)
+    return a
+
+def add_lace(m, th0):
+    """Ficelle de laçage VERTICALE descendant de la peau + petites accroches horizontales."""
     n = 72
     centers = []
     for i in range(n+1):
         t = i / n
         z = LACE_ZTOP + (LACE_ZBOT - LACE_ZTOP) * t
-        ph = (LACE_ZIG * 2) * t + phase
-        tri = abs((ph % 2.0) - 1.0)
-        a = th0 + LACE_AMP * (1.0 - 2.0 * tri)
-        if TXT_ZONE[0] <= z <= TXT_ZONE[1]:   # la ficelle contourne le texte
-            d = ((a - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
-            bow = LACE_BOW + 0.013 * round(th0 / (2*math.pi) * N_LACE)  # decalage unique par ficelle (evite les sommets communs)
-            if abs(d) < bow:
-                a = TEXT_THETA + math.copysign(bow, d if abs(d) > 1e-6 else 1.0)
+        a = _lace_angle(th0, z)
         r = radius(a, z)
         centers.append((a, z, LACE_HW_MM / r))
     _strip_surface(m, centers, LACE_RELIEF)
+    # accroches horizontales (petits traits) tous les TICK_DZ mm, hors zone texte
+    z = LACE_ZTOP - TICK_DZ / 2
+    while z > LACE_ZBOT + TICK_DZ / 2:
+        if not (TXT_ZONE[0] <= z <= TXT_ZONE[1]):
+            a = _lace_angle(th0, z)
+            r = radius(a, z)
+            hw = (TICK_LEN / 2) / r
+            tick = []
+            for j in range(9):
+                aa = a - hw + 2 * hw * j / 8
+                tick.append((aa, z, LACE_HW_MM / radius(aa, z)))
+            _strip_surface(m, tick, LACE_RELIEF)
+        z -= TICK_DZ
 
 def _densify(poly, w, r_loc, max_arc=0.025):
     """Sous-echantillonne la polyligne pour que le trait epouse la courbure (pas de trous aux angles)."""
@@ -288,9 +304,9 @@ def build():
             m.quad(a, b, c, d)
     add_tore(m, TORE_CERC_Z, TORE_CERC_R, TORE_CERC_TUBE, 24, 96)
     add_tore(m, TORE_CERC_Z + 0.35*SCALE, TORE_CERC_R - 0.2*SCALE, 0.5*SCALE, 24, 72)  # second cerclage fin
-    # ficelles de laçage apparentes descendant de la peau (entre les cordons)
+    # ficelles de laçage verticales + accroches horizontales, descendant de la peau
     for i in range(N_LACE):
-        add_lace(m, 2 * math.pi * (i + 0.5) / N_LACE, (i % 2) * 0.5)
+        add_lace(m, 2 * math.pi * (i + 0.5) / N_LACE)
     # --- crochet integre directement a la face du tambour : boucle seule, ---
     # --- le tore penetre la paroi haute du fut (pas de bras) ---
     add_tore(m, BOUCLE_Z, BOUCLE_R, BOUCLE_TUBE, 26, 64, cx=BOUCLE_CX)

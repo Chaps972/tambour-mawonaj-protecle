@@ -10,8 +10,8 @@
 - Fût bombé façon tambour ka/bèlè, Ø max ~29,7 mm, hauteur fût 36 mm
 - Double bande décorative en bas, deux rangées de chevrons, bande haute
 - **Peau bombée uniforme et nette** (dôme 1,5 mm) avec double cerclage métallique
-- **8 ficelles de laçage apparentes** en relief (~0,8 mm de Ø) descendant de la peau en zigzag jusqu'à la bande basse, en contournant le texte
-- Inscription **« Mawonaj » en script très épais** (M majuscule) en relief 1,9 mm, traits ~1,6 mm
+- **8 ficelles de laçage verticales apparentes + accroches horizontales** en relief (~0,8 mm de Ø) verticales, descendant de la peau jusqu'à la bande basse, avec accroches horizontales, en contournant le texte
+- Inscription **« Mawonaj » en script très épais** (M majuscule) en lettres ~7 mm, relief ~2,1 mm, traits ~1,8 mm
 - **Crochet EN BAS soudé à la paroi basse du fût** : boucle horizontale **à la base (z=0, posée sur le plateau, zéro bavure)** (Ø trou ~5,8 mm), aucun bras — **aucun support** (la base plate repose sur le plateau, peau vers le haut) — **inscription à l'opposé (180°)**
 - **Aucun support nécessaire**
 
@@ -31,8 +31,8 @@
 | Orientation | à plat, peau vers le haut (Z+) |
 
 ## Conseils
-- Texte script : relief 1,9 mm, traits ~1,6 mm → très lisibles. Conseil : hauteur de couche 0,08 mm (ou adaptative) pour un texte encore plus net sur la paroi verticale.
-- Ficelles de laçage : Ø ~0,8 mm ≈ 6–7 couches → visibles et solides.
+- Texte script : lettres ~7 mm, relief ~2,1 mm, traits ~1,8 mm → très lisibles. Conseil : hauteur de couche 0,08 mm (ou adaptative) pour un texte encore plus net sur la paroi verticale.
+- Ficelles verticales Ø ~0,9 mm + accroches horizontales 3,2 mm → visibles et solides.
 - Vérifier l'échelle à l'import : 37,8 × 30,2 × 37,5 mm.
 - Option « ironing » sur la peau (dessus) et sur la face du texte.
 
