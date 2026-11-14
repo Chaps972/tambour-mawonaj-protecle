@@ -67,14 +67,14 @@ SCRIPT = {
  'a': [_arc(1.5,2.6,1.8, _R(75), _R(75)-2*math.pi, 20) + [(3.3,4.5),(3.3,0.3),(3.95,-0.2)]],
  'w': [[(0.0,4.6),(0.7,0.3),(1.4,4.4),(2.1,0.3),(2.8,4.6)]],
  'o': [_arc(1.8,2.6,1.8, _R(90), _R(90)-2*math.pi, 20) + [(1.8,4.4),(2.7,4.7)]],
- 'n': [[(0.0,4.6),(0.3,0.3),(1.0,4.4),(1.8,0.3),(2.4,3.6)]],
+ 'n': [[(0.0,4.6),(0.3,0.3),(0.75,3.8),(1.1,4.6),(1.55,3.8),(1.9,0.3),(2.5,4.2)]],
  'j': [_arc(1.0,6.1,0.45, 0, -2*math.pi, 10),
        [(1.0,4.6),(1.0,0.6),(0.7,-0.8),(-0.1,-1.7),(-0.95,-1.25)]],
 }
 
 def _adv(ch):
     g = SCRIPT.get(ch, SCRIPT['o'])
-    return max(p[0] for stroke in g for p in stroke) + 2.8   # lettres bien separees (marge pour la largeur des tubes)
+    return max(p[0] for stroke in g for p in stroke) + 2.4   # lettres separees, sans que 2 ficelles ne se chevauchent aux bords du texte
 
 def bande(z, z0, z1, h, ramp=0.8):
     if z < z0 - ramp or z > z1 + ramp:
@@ -176,12 +176,21 @@ def _strip_surface(m, centers, relief):
     m.quad(Lin[0], Lout[0], Rout[0], Rin[0])
     m.quad(Lin[n-1], Lout[n-1], Rout[n-1], Rin[n-1])
 
+_TEXT_HALF = None
+def text_half_angle():
+    """Demi-angle du texte (largeur reelle + rayon des tubes) : les ficelles s'alignent dessus."""
+    global _TEXT_HALF
+    if _TEXT_HALF is None:
+        r_loc = radius(TEXT_THETA, TXT_ZBOT + 3.5 * TXT_H)
+        _TEXT_HALF = (sum(_adv(c) for c in TEXT) * TXT_W / 2 + TXT_HW * TXT_W) / r_loc
+    return _TEXT_HALF
+
 def _lace_angle(th0, z):
-    """Angle de la ficelle a la hauteur z : vertical, contourne la zone du texte."""
+    """Angle de la ficelle a la hauteur z : verticale, colle aux bords du texte."""
     a = th0
     if TXT_ZONE[0] <= z <= TXT_ZONE[1]:
         d = ((a - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
-        bow = LACE_BOW + 0.013 * round(th0 / (2*math.pi) * N_LACE)  # decalage unique par ficelle
+        bow = text_half_angle() + 0.06 + 0.013 * round(th0 / (2*math.pi) * N_LACE)  # aligne sur le texte + marge + jitter unique
         if abs(d) < bow:
             a = TEXT_THETA + math.copysign(bow, d if abs(d) > 1e-6 else 1.0)
     return a
