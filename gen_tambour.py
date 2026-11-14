@@ -28,7 +28,7 @@ CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.62*H, 0.78*H, 0.70*SCALE, 8  # 2e ran
 
 TEXT       = "Mawonaj"   # script, M majuscule
 TXT_ZBOT   = 0.36 * H
-TXT_W      = 1.05 * SCALE
+TXT_W      = 1.00 * SCALE   # largeur lettre (interlettrage augmente dans _adv)
 TXT_H      = 1.35 * SCALE   # lettres plus hautes (~7 mm)
 TXT_RELIEF = 2.8 * SCALE    # relief ~2,1 mm
 TXT_HW     = 1.15           # traits ~1,8 mm : lettres nettes, w/n complets
@@ -55,7 +55,7 @@ LACE_HW_MM = 0.45          # demi-largeur de la ficelle (mm)
 LACE_RELIEF = 0.55         # relief de la ficelle (mm)
 TICK_DZ    = 4.5           # espacement des accroches horizontales (mm)
 TICK_LEN   = 3.2           # longueur des accroches horizontales (mm)
-LACE_BOW   = 1.05          # les ficelles contournent la zone du texte (rad)
+LACE_BOW   = 1.20          # les ficelles contournent la zone du texte (rad)
 
 # ---------------- Police script (traits, unites : hauteur 0..7, y vers le haut) ----------------
 def _arc(cx, cy, r, a0, a1, n=16):
@@ -74,7 +74,7 @@ SCRIPT = {
 
 def _adv(ch):
     g = SCRIPT.get(ch, SCRIPT['o'])
-    return max(p[0] for stroke in g for p in stroke) + 1.1
+    return max(p[0] for stroke in g for p in stroke) + 1.8   # lettres bien separees
 
 def bande(z, z0, z1, h, ramp=0.8):
     if z < z0 - ramp or z > z1 + ramp:
@@ -91,7 +91,7 @@ def radius(theta, z):
     att = math.sin(math.pi * t) ** 2
     if TXT_ZONE[0] <= z <= TXT_ZONE[1]:
         dth = ((theta - TEXT_THETA + math.pi) % (2*math.pi)) - math.pi
-        cf = 0.10 if abs(dth) < 1.15 else 1.0   # lissage local autour du texte
+        cf = 0.10 if abs(dth) < 1.25 else 1.0   # lissage local autour du texte
     else:
         cf = 1.0
     r += CORDE_AMP * att * cf * math.cos(N_CORDES * theta)
