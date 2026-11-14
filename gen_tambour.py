@@ -28,10 +28,10 @@ CHEV2_Z0, CHEV2_Z1, CHEV2_AMP, N_CHEV2 = 0.62*H, 0.78*H, 0.70*SCALE, 8  # 2e ran
 
 TEXT       = "Mawonaj"   # script, M majuscule
 TXT_ZBOT   = 0.36 * H
-TXT_W      = 1.00 * SCALE   # largeur lettre (interlettrage augmente dans _adv)
+TXT_W      = 0.95 * SCALE   # largeur lettre (interlettrage augmente dans _adv)
 TXT_H      = 1.35 * SCALE   # lettres plus hautes (~7 mm)
 TXT_RELIEF = 2.8 * SCALE    # relief ~2,1 mm
-TXT_HW     = 0.72           # traits ~1,1 mm (ratio 0.15/hauteur) : contre-formes ouvertes, lettres lisibles
+TXT_HW     = 0.87           # rayon du tube (mm) => trait Ø ~1,3 mm, contre-formes toujours ouvertes (tubes ronds)
 TXT_ZONE   = (TXT_ZBOT - 2.6*TXT_H - 0.6, TXT_ZBOT + 7.6*TXT_H + 0.6)
 TEXT_THETA = math.pi        # inscription a l'OPPOSE du crochet (crochet a theta = 0)
 
@@ -74,7 +74,7 @@ SCRIPT = {
 
 def _adv(ch):
     g = SCRIPT.get(ch, SCRIPT['o'])
-    return max(p[0] for stroke in g for p in stroke) + 1.8   # lettres bien separees
+    return max(p[0] for stroke in g for p in stroke) + 2.8   # lettres bien separees (marge pour la largeur des tubes)
 
 def bande(z, z0, z1, h, ramp=0.8):
     if z < z0 - ramp or z > z1 + ramp:
@@ -223,44 +223,45 @@ def _densify(poly, w, r_loc, max_arc=0.025):
     return out
 
 def _render_stroke(m, poly, x_off, z_bot, w, h, relief, th0, r_loc):
-    """Extrude un trait (polyligne en unites de glyphe) en relief courbe sur le fut."""
+    """Trace un trait en TUBE ROND (corde) suivant la courbure du fut.
+    Les tubes ronds ne bouchent jamais les contre-formes aux angles (M/W/N lisibles)."""
     poly = _densify(poly, w, r_loc)
-    n = len(poly)
-    # direction en chaque point (moyenne des segments adjacents)
-    dirs = []
+    rad = TXT_HW * w            # rayon du tube (mm)
+    embed = 0.15                # le tube est legerement ancre dans la paroi
+    P = []
+    for (px, py) in poly:
+        a = TEXT_THETA + th0 + ((x_off + px) * w) / r_loc
+        z = z_bot + py * h
+        P.append((a, z, radius(a, z) + rad - embed))
+    C = [(r*math.cos(a), r*math.sin(a), z) for (a, z, r) in P]
+    n = len(P)
+    MR = 10
+    rings = []
     for i in range(n):
-        if i == 0:
-            dx, dy = poly[1][0]-poly[0][0], poly[1][1]-poly[0][1]
-        elif i == n-1:
-            dx, dy = poly[n-1][0]-poly[n-2][0], poly[n-1][1]-poly[n-2][1]
-        else:
-            dx = poly[i+1][0]-poly[i-1][0]; dy = poly[i+1][1]-poly[i-1][1]
-        ln = math.hypot(dx, dy) or 1.0
-        dirs.append((dx/ln, dy/ln))
-    Lin, Lout, Rin, Rout = [], [], [], []
-    for i, (px, py) in enumerate(poly):
-        dx, dy = dirs[i]
-        ox, oy = -dy * TXT_HW, dx * TXT_HW   # perpendiculaire
-        for (sx, out) in ((1, 'L'), (-1, 'R')):
-            gx = x_off + px + sx*ox
-            gy = py + sx*oy
-            a = TEXT_THETA + th0 + (gx * w) / r_loc
-            z = z_bot + gy * h
-            rs = radius(a, z)
-            ro = rs + relief
-            vi = m.v(rs*math.cos(a), rs*math.sin(a), z)
-            vo = m.v(ro*math.cos(a), ro*math.sin(a), z)
-            if out == 'L':
-                Lin.append(vi); Lout.append(vo)
-            else:
-                Rin.append(vi); Rout.append(vo)
+        if i == 0: T = sub(C[1], C[0])
+        elif i == n-1: T = sub(C[n-1], C[n-2])
+        else: T = sub(C[i+1], C[i-1])
+        ln = math.sqrt(dot(T, T)) or 1.0
+        T = (T[0]/ln, T[1]/ln, T[2]/ln)
+        a = P[i][0]
+        radial = (math.cos(a), math.sin(a), 0.0)
+        u = cross(T, radial)
+        lu = math.sqrt(dot(u, u)) or 1.0
+        u = (u[0]/lu, u[1]/lu, u[2]/lu)
+        v = cross(T, u)
+        rings.append([m.v(C[i][0] + rad*(u[0]*math.cos(2*math.pi*j/MR) + v[0]*math.sin(2*math.pi*j/MR)),
+                          C[i][1] + rad*(u[1]*math.cos(2*math.pi*j/MR) + v[1]*math.sin(2*math.pi*j/MR)),
+                          C[i][2] + rad*(u[2]*math.cos(2*math.pi*j/MR) + v[2]*math.sin(2*math.pi*j/MR)))
+                      for j in range(MR)])
     for i in range(n-1):
-        m.quad(Lout[i], Rout[i], Rout[i+1], Lout[i+1])      # dessus
-        m.quad(Lin[i], Lin[i+1], Rin[i+1], Rin[i])          # dessous (sur la peau)
-        m.quad(Lin[i], Lout[i], Lout[i+1], Lin[i+1])        # paroi gauche
-        m.quad(Rin[i], Rin[i+1], Rout[i+1], Rout[i])        # paroi droite
-    m.quad(Lin[0], Lout[0], Rout[0], Rin[0])                # cap debut
-    m.quad(Lin[n-1], Lout[n-1], Rout[n-1], Rin[n-1])        # cap fin
+        for j in range(MR):
+            j2 = (j+1) % MR
+            m.quad(rings[i][j], rings[i][j2], rings[i+1][j2], rings[i+1][j])
+    c0 = m.v(*C[0]); c1 = m.v(*C[n-1])
+    for j in range(MR):
+        j2 = (j+1) % MR
+        m.tri(c0, rings[0][j2], rings[0][j])
+        m.tri(c1, rings[n-1][j], rings[n-1][j2])
 
 def add_texte(m, text, z_bot, w, h, relief):
     r_loc = radius(TEXT_THETA, z_bot + 3.5 * h)
