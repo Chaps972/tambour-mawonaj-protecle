@@ -10,7 +10,7 @@ Projet de fichier STL imprimable en 3D : tambour antillais (gwoka) en porte-clé
 | `tambour_mawonaj_portecle.stl` | STL final à imprimer (binaire, 57 528 triangles, ~2,88 Mo) — généré par le script |
 | `README_impression_Kobra3.md` | Fiche de réglages d'impression Kobra 3 |
 
-## Caractéristiques du modèle (v11)
+## Caractéristiques du modèle (v12)
 
 - Dimensions : **37,8 × 30,2 × 37,5 mm** — un vrai porte-clés, pas un bloc plein
 - Volume solide ~20,9 cm³ → environ **8–9 g en PLA à 20 % de remplissage**
