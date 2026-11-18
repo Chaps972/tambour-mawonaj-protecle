@@ -32,6 +32,24 @@ python3 gen_tambour.py
 - Ficelles de laçage : `N_LACE`, `LACE_ZIG`, `LACE_AMP`, `LACE_HW_MM`, `LACE_RELIEF`, `LACE_BOW`
 - Boucle : `BOUCLE_CX` / `BOUCLE_Z` / `BOUCLE_R` / `BOUCLE_TUBE`
 
+## Impression BICOLORE (Kobra 3 Combo + ACE Pro)
+
+Deux fichiers fournis pour assigner une couleur par objet (méthode la plus fiable) :
+
+| Fichier | Rôle | Couleur suggérée |
+|---|---|---|
+| `tambour_corps.stl` | le tambour sans les lettres (60 864 tris) | ex. rouge (slot 1) |
+| `lettres_mawonaj.stl` | uniquement les lettres « Mawonaj » (6 020 tris) | ex. or/blanc (slot 2) |
+
+Procédure dans **Anycubic Slicer Next** :
+1. Profil imprimante = **Kobra 3 Combo** ; onglet filaments : ajoute un 2e filament (bouton « + »), choisis les couleurs ; « Sync from ACE Pro » si l'imprimante est liée pour récupérer les vraies bobines chargées.
+2. Glisse **les deux STL** sur le plateau (même origine → ils se superposent exactement).
+3. Dans la liste des objets, sélectionne `lettres_mawonaj` → clic droit → **« Change filament »** (ou colonne filament) → **slot 2**. Le corps reste sur le slot 1.
+4. La tour de purge est ajoutée automatiquement ; règle les « flush volumes » si bavardage de couleur (foncé → clair = purger plus).
+5. Slice et envoie : l'ACE Pro fait les changements de filament tout seul.
+
+Alternative sans 2 fichiers : importer `tambour_mawonaj_portecle.stl` seul → outil **« Color Painting »** (pinceau en haut) → peindre les lettres avec la couleur du slot 2 (brosses Sphere/Fill).
+
 ## Impression (Anycubic Kobra 3)
 
 Couches 0,12 mm, 4 parois, gyroid 20 %, aucun support, brim 3–4 mm, PLA 200–210 °C / plateau 60 °C, à plat peau vers le haut. Détails dans `README_impression_Kobra3.md`.
